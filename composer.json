@@ -1,0 +1,19 @@
+{
+    "name": "maneuver/bitbucket-wp-updater",
+    "description": "Update your own Wordpress plugin from a private BitBucket repository.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David De Coninck",
+            "email": "david@maneuver.be"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Maneuver\\BitbucketWpUpdater\\" : "src/"
+        }
+    },
+    "require": {}
+}
