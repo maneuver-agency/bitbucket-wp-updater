@@ -19,7 +19,7 @@ In your main plugin file:
 
     new \Maneuver\BitbucketWpUpdater\PluginUpdater(__FILE__, $repo, $bitbucket_username, $bitbucket_app_pass);
 
-*Note: [Read more about BitBucket app passwords](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)*
+*NOTE: [Read more about BitBucket app passwords](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)*
 
 Update the version number inside your main plugin file:
 
@@ -35,3 +35,8 @@ And tag the commit:
     git tag v1.0.0
 
 *NOTE: Use basic SemVer notation (a leading 'v' is allowed).*
+
+
+## Caveats
+
+Only works on activated plugins. For now.
