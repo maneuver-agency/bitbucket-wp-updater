@@ -72,6 +72,11 @@ class PluginUpdater {
     $this->initPluginData();
     $this->getRepoReleaseInfo();
 
+    if (empty($this->bitbucketAPIResult)) {
+      // Nothing found.
+      return $transient;
+    }
+
     $bb_version = str_replace('v', '', $this->bitbucketAPIResult->name);
 
     // Check the versions if we need to do an update
