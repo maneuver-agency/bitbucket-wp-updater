@@ -17,9 +17,9 @@ In your main plugin file:
     $bitbucket_username = '';   // your BitBucket username
     $bitbucket_app_pass = '';   // the generated app password with read access
 
-    new \Maneuver\BitbucketWpUpdater\PluginUpdater(__FILE__, $repo, $bitbucket_username, bitbucket_app_pass);
+    new \Maneuver\BitbucketWpUpdater\PluginUpdater(__FILE__, $repo, $bitbucket_username, $bitbucket_app_pass);
 
-*Note: [Read more about BitBucket app passords](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)*
+*Note: [Read more about BitBucket app passwords](https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html)*
 
 Update the version number inside your main plugin file:
 
