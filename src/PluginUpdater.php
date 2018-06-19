@@ -13,7 +13,7 @@ class PluginUpdater {
 
   function __construct($pluginFile, $repo, $bbUsername, $bbPassword) {
     add_filter( "pre_set_site_transient_update_plugins", array( $this, "setTransient" ) );
-    // add_filter( "plugins_api", array( $this, "setPluginInfo" ), 10, 3 );
+    add_filter( "plugins_api", array( $this, "setPluginInfo" ), 10, 3 );
     add_filter( "upgrader_post_install", array( $this, "postInstall" ), 10, 3 );
     add_filter('http_request_args', array($this, 'modifyRequestArgs'), 10, 2);
 
@@ -29,6 +29,16 @@ class PluginUpdater {
     $this->pluginData = get_plugin_data( $this->pluginFile );
   }
 
+  private function makeRequest($url) {
+    $process = curl_init($url);
+    curl_setopt($process, CURLOPT_USERPWD, sprintf('%s:%s', $this->bitbucketUsername, $this->bitbucketPassword));
+    curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
+    $response = curl_exec($process);
+    curl_close($process);
+
+    return $response;
+  }
+
   // Get information regarding our plugin from GitHub
   private function getRepoReleaseInfo() {
 
@@ -39,13 +49,7 @@ class PluginUpdater {
 
     $url = sprintf('https://api.bitbucket.org/2.0/repositories/%s/refs/tags?sort=-target.date', $this->repo);
 
-    $process = curl_init($url);
-    curl_setopt($process, CURLOPT_USERPWD, sprintf('%s:%s', $this->bitbucketUsername, $this->bitbucketPassword));
-    curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
-    $response = curl_exec($process);
-    curl_close($process);
-
-    // var_dump($response);exit;
+    $response = $this->makeRequest($url);
 
     if ($response) {
       $data = json_decode($response);
@@ -101,6 +105,28 @@ class PluginUpdater {
     return $transient;
   }
 
+  public function getReadmeFile() {
+    $sha = 'HEAD';
+
+    $url = sprintf('https://bitbucket.org/%s/raw/%s/readme.txt', 
+      $this->repo, 
+      $sha
+    );
+
+    $url = sprintf('https://api.bitbucket.org/2.0/repositories/%s/src/HEAD/readme.txt', $this->repo);
+
+    $response = $this->makeRequest($url);
+
+    $decode = json_decode($response);
+
+    // No file found or other error.
+    if ($decode) {
+      return false;
+    }
+
+    return $response;
+  }
+
   public function modifyRequestArgs($args, $url) {
     if (preg_match('/bitbucket.org(.+)' . str_replace('/', '\/', $this->repo) . '/', $url)) {
       if (empty($args['headers'])) {
@@ -112,8 +138,28 @@ class PluginUpdater {
   }
 
   // Push in plugin version information to display in the details lightbox
-  public function setPluginInfo( $false, $action, $response ) {
-    return $response;
+  public function setPluginInfo( $res, $action, $args ) {
+    $this->initPluginData();
+
+    if ($action == 'plugin_information' && $args->slug == $this->slug) {
+      $res = new \stdClass();
+      $res->name = $this->pluginData['Name'];
+      $res->slug = $this->slug;
+
+      $changelog = 'No readme file present in repo.';
+
+      $readme = $this->getReadmeFile();
+      if ($readme) {
+        $Parsedown = new \Parsedown();
+        $changelog = $Parsedown->text($readme);
+      }
+
+      $res->sections = [
+        'changelog' => $changelog,
+      ];
+    }
+
+    return $res;
   }
 
   // Perform additional actions to successfully install our plugin
