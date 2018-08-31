@@ -13,8 +13,8 @@ In your main plugin file:
 
     require('vendor/autoload.php');
 
-    $repo = '';                 // name of your repository
-    $bitbucket_username = '';   // your BitBucket username
+    $repo = '';                 // name of your repository. This is either "<user>/<repo>" or "<team>/<repo>".
+    $bitbucket_username = '';   // your personal BitBucket username
     $bitbucket_app_pass = '';   // the generated app password with read access
 
     new \Maneuver\BitbucketWpUpdater\PluginUpdater(__FILE__, $repo, $bitbucket_username, $bitbucket_app_pass);
